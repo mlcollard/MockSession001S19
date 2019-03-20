@@ -32,6 +32,15 @@ public:
     virtual std::time_t now() const { return 60 * 60; }
 };
 
+class ConfigurableClock : public Clock {
+public:
+    ConfigurableClock(std::time_t amount) : length(amount) {}
+    virtual std::time_t start() const { return 0; }
+    virtual std::time_t now() const { return length; }
+private:
+    std::time_t length;
+};
+
 class Session {
 public:
     Session(const Clock& clock = TimeClock()) : clock(clock), start_time(clock.start()), end_time(0) {}
@@ -63,6 +72,14 @@ int main() {
 
     {
         HourClock clock;
+        Session s(clock);
+        s.stop();
+        
+        assert(s.seconds() == 60 * 60);
+    }
+
+    {
+        ConfigurableClock clock(60 * 60);
         Session s(clock);
         s.stop();
         
